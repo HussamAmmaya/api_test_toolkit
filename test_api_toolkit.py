@@ -1,11 +1,16 @@
 import pytest
 import requests
-from api_test_toolkit import fetch_data
+from api_test_toolkit import fetch_data, fetch_status, send_data
 
 
 @pytest.fixture
 def mock_get(mocker):
     return mocker.patch("api_test_toolkit.requests.get")
+
+@pytest.fixture
+def mock_post(mocker):
+    return mocker.patch("api_test_toolkit.requests.post")
+
 
 @pytest.mark.parametrize("error_code", [401, 404, 500, 503])
 def test_fetch_data_error_code(mock_get, error_code):
@@ -14,8 +19,19 @@ def test_fetch_data_error_code(mock_get, error_code):
     
 
     with pytest.raises(requests.exceptions.HTTPError):
-        fetch_data("https://fake-url.com")    
+        fetch_data("https://fake-url.com")       
 
+@pytest.mark.smoke
+def test_send_data_success(mock_post):
+    # Mock the requests.post method to return a successful response
+    mock_post.return_value.status_code = 201
+    mock_post.return_value.json.return_value = {"id": 101, "title": "Test"}
+
+    payload = {"title": "Test"}
+    result = send_data("https://fake-url.com", payload)
+    assert result == {"id": 101, "title": "Test"}
+
+@pytest.mark.smoke
 def test_fetch_data_success(mock_get):
     # Mock the requests.get method to return a successful response
     mock_get.return_value.status_code = 200
@@ -30,3 +46,18 @@ def test_fetch_data_failure(mock_get):
 
     with pytest.raises(requests.exceptions.HTTPError):
         fetch_data("https://fake-url.com")
+
+def test_fetch_status_success(mock_get):
+    # Mock the requests.get method to return a successful response
+    mock_get.return_value.status_code = 200
+    result = fetch_status("https://fake-url.com")
+    assert result == 200
+
+
+def test_fetch_status_returns_error_code(mock_get):
+    # Mock the requests.get method to return a successful response
+    mock_get.return_value.status_code = 404
+    result = fetch_status("https://fake-url.com")
+    assert result == 404
+
+

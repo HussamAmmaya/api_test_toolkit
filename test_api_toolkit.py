@@ -1,6 +1,6 @@
 import pytest
 import requests
-from api_test_toolkit import fetch_data, fetch_status, send_data, get_required_fields
+from api_test_toolkit import fetch_data, fetch_status, send_data, get_required_fields, get_env_var
 
 
 @pytest.fixture
@@ -72,3 +72,7 @@ def test_get_required_fields_missing_field ():
     with pytest.raises(KeyError) as exc_info:                 # Act & Assert
         get_required_fields(data, required_fields)
     assert "Missing required field: email" in str(exc_info.value)  # Assert
+
+def test_get_env_var_returns_value(monkeypatch):
+    monkeypatch.setenv("TEST_VAR", "test_value")
+    assert get_env_var("TEST_VAR") == "test_value"

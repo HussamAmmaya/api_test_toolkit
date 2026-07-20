@@ -76,3 +76,12 @@ def test_get_required_fields_missing_field ():
 def test_get_env_var_returns_value(monkeypatch):
     monkeypatch.setenv("TEST_VAR", "test_value")
     assert get_env_var("TEST_VAR") == "test_value"
+
+
+def test_get_env_var_raises_error(monkeypatch):
+    monkeypatch.delenv("TEST_VAR", raising=False)
+    with pytest.raises(RuntimeError) as exc_info:
+        get_env_var("TEST_VAR")
+    assert "Environment variable 'TEST_VAR' is not set." in str(exc_info.value)
+
+

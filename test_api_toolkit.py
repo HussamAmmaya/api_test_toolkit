@@ -1,6 +1,6 @@
 import pytest
 import requests
-from api_test_toolkit import fetch_data, fetch_status, send_data
+from api_test_toolkit import fetch_data, fetch_status, send_data, get_required_fields
 
 
 @pytest.fixture
@@ -60,4 +60,15 @@ def test_fetch_status_returns_error_code(mock_get):
     result = fetch_status("https://fake-url.com")
     assert result == 404
 
+def test_get_required_fields_success():
+    data = {"name": "Ahmad", "email": "ahmad@example.com"}   # Arrange
+    required_fields = ["name", "email"]                       # Arrange
+    result = get_required_fields(data, required_fields)       # Act
+    assert result == {"name": "Ahmad", "email": "ahmad@example.com"}  # Assert
 
+def test_get_required_fields_missing_field ():
+    data = {"name": "Ahmad"}                                   # Arrange
+    required_fields = ["name", "email"]                       # Arrange
+    with pytest.raises(KeyError) as exc_info:                 # Act & Assert
+        get_required_fields(data, required_fields)
+    assert "Missing required field: email" in str(exc_info.value)  # Assert

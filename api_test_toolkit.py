@@ -15,7 +15,7 @@ def get_env_var(name: str) -> str:
         )
     return value
 
-BASE_URL = get_env_var("BASE_")
+BASE_URL = get_env_var("BASE_URL")
 
 def fetch_data(BASE_URL):
         response = requests.get(BASE_URL)
